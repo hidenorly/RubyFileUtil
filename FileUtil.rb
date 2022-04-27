@@ -1,4 +1,4 @@
-#  Copyright (C) 2021 hidenorly
+#  Copyright (C) 2021, 2022 hidenorly
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -137,5 +137,84 @@ class FileUtil
 		open(path, "a") do |f|
 			f.puts line
 		end
+	end
+end
+
+class Stream
+	def initialize
+	end
+
+	def eof?
+		return true
+	end
+
+	def readline
+		return nil
+	end
+
+	def each_line
+		return [].each
+	end
+
+	def each
+		return each_line
+	end
+
+	def readlines
+		return []
+	end
+end
+
+class ArrayStream < Stream
+	def initialize(dataArray)
+		@dataArray = dataArray.to_a
+		@nPos = 0
+	end
+
+	def eof?
+		return @nPos>=(@dataArray.length)
+	end
+
+	def readline
+		result = nil
+		if !eof?() then
+			result = @dataArray[@nPos]
+			@nPos = @nPos + 1
+		end
+		return result
+	end
+
+	def each_line
+		return @dataArray.each
+	end
+
+	def readlines
+		return @dataArray
+	end
+end
+
+class FileStream < Stream
+	def initialize(path)
+		if File.exist?(path) then
+			@io = File.open(path)
+		else
+			@io = nil
+		end
+	end
+
+	def eof?
+		return @io ? @io.eof? : true
+	end
+
+	def readline
+		return @io ? @io.readline : nil
+	end
+
+	def each_line
+		return @io ? @io.each_line : [].each
+	end
+
+	def readlines
+		return @io ? @io.readlines : []
 	end
 end
