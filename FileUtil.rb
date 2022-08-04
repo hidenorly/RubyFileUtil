@@ -20,7 +20,11 @@ class FileUtil
 
 		path = ""
 		paths.each do |aPath|
-			path += "/"+aPath
+			if !path.empty? then
+				path += "/"+aPath
+			else
+				path = aPath
+			end
 			Dir.mkdir(path) if !Dir.exist?(path)
 		end
 	end
@@ -49,14 +53,14 @@ class FileUtil
 		ensureDirectory(path)
 	end
 
-	def self.iteratePath(path, matchKey, pathes, recursive, dirOnly, fullMatch=false)
+	def self.iteratePath(path, matchKey, pathes, recursive, dirOnly)
 		Dir.foreach( path ) do |aPath|
 			next if aPath == '.' or aPath == '..'
 
 			fullPath = path.sub(/\/+$/,"") + "/" + aPath
 			if FileTest.directory?(fullPath) then
 				if dirOnly then
-					if matchKey==nil || ( aPath.match(matchKey)!=nil ) || (fullMatch && fullPath.match(matchKey)) then
+					if matchKey==nil || ( aPath.match(matchKey)!=nil ) then 
 						pathes.push( fullPath )
 					end
 				end
@@ -65,7 +69,7 @@ class FileUtil
 				end
 			else
 				if !dirOnly then
-					if matchKey==nil || ( aPath.match(matchKey)!=nil ) then
+					if matchKey==nil || ( aPath.match(matchKey)!=nil ) then 
 						pathes.push( fullPath )
 					end
 				end
@@ -75,31 +79,32 @@ class FileUtil
 
 	def self.getFilenameFromPath(path)
 		pos = path.rindex("/")
-		return pos ? path.slice(pos+1,path.length-pos) : path
+		path = pos ? path.slice(pos+1, path.length-pos) : path
+		return path
+	end
+
+	def self.getFilenameFromPathWithoutExt(path)
+		path = getFilenameFromPath(path)
+		pos = path.to_s.rindex(".")
+		path = pos ? path.slice(0, pos) : path
+		return path
 	end
 
 	def self.getDirectoryFromPath(path)
 		pos = path.rindex("/")
-		return pos ? path.slice(0,pos) : path
+		path = pos ? path.slice(0, pos) : path
+		while( path.end_with?("/") ) do
+			path = path.slice( 0, path.length-1 )
+		end
+		return path
 	end
 
 	# get regexp matched file list
-	def self.getSpecifiedFiles(path, regExpFilter)
-		paths = []
-
-		path = File.expand_path(path.to_s) if path
-
-		if FileTest.directory?(path) then
-			iteratePath(path, regExpFilter, paths, true, false, false)
-		elsif File.exist?(path) then
-			paths << path
-		end
-
-		return paths
-	end
-
 	def self.getRegExpFilteredFiles(basePath, fileFilter)
-		return getSpecifiedFiles(basePath, fileFilter)
+		result=[]
+		iteratePath(basePath, fileFilter, result, true, false)
+
+		return result
 	end
 
 	def self.writeFile(path, body)
