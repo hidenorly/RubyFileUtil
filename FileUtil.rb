@@ -53,7 +53,7 @@ class FileUtil
 		ensureDirectory(path)
 	end
 
-	def self.iteratePath(path, matchKey, pathes, recursive, dirOnly)
+	def self.iteratePath(path, matchKey, pathes, recursive, dirOnly, fullMatch=false)
 		Dir.foreach( path ) do |aPath|
 			next if aPath == '.' or aPath == '..'
 
@@ -69,7 +69,7 @@ class FileUtil
 				end
 			else
 				if !dirOnly then
-					if matchKey==nil || ( aPath.match(matchKey)!=nil ) then 
+					if matchKey==nil || ( aPath.match(matchKey)!=nil ) || (fullMatch && fullPath.match(matchKey)) then
 						pathes.push( fullPath )
 					end
 				end
@@ -97,6 +97,21 @@ class FileUtil
 			path = path.slice( 0, path.length-1 )
 		end
 		return path
+	end
+
+	# get regexp matched file list
+	def self.getSpecifiedFiles(path, regExpFilter)
+		paths = []
+
+		path = File.expand_path(path.to_s) if path
+
+		if FileTest.directory?(path) then
+			iteratePath(path, regExpFilter, paths, true, false, false)
+		elsif File.exist?(path) then
+			paths << path
+		end
+
+		return paths
 	end
 
 	# get regexp matched file list
