@@ -12,72 +12,85 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-require "./StrUtil"
+require_relative "StrUtil"
+require_relative "TaskManager"
 
 class FileUtil
 	def self.ensureDirectory(path)
-		paths = path.split("/")
-
+		paths = path.to_s.split("/")
 		path = ""
-		paths.each do |aPath|
-			if !path.empty? then
-				path += "/"+aPath
-			else
-				path = aPath
+		begin
+			paths.each do |aPath|
+				if !path.empty? then
+					path += "/"+aPath
+				else
+					path = aPath
+				end
+				Dir.mkdir(path) if !Dir.exist?(path)
 			end
-			Dir.mkdir(path) if !Dir.exist?(path)
+		rescue => e
 		end
 	end
 
 	def self.removeDirectoryIfNoFile(path)
 		found = false
-		Dir.foreach( path ) do |aPath|
-			next if aPath == '.' or aPath == '..'
-			found = true
-			break
+		begin
+			Dir.foreach( path ) do |aPath|
+				next if aPath == '.' or aPath == '..'
+				found = true
+				break
+			end
+			FileUtils.rm_rf(path) if !found
+		rescue => e
 		end
-		FileUtils.rm_rf(path) if !found
 	end
 
 	def self.cleanupDirectory(path, recursive=false, force=false)
-		if recursive && force then
-			FileUtils.rm_rf(path)
-		elsif recursive then
-			FileUtils.rm_r(path)
-		elsif force then
-			FileUtils.rm_f(path)
-		else
-			FileUtils.rmdir(path)
+		begin
+			if recursive && force then
+				FileUtils.rm_rf(path)
+			elsif recursive then
+				FileUtils.rm_r(path)
+			elsif force then
+				FileUtils.rm_f(path)
+			else
+				FileUtils.rmdir(path)
+			end
+		rescue => e
 		end
 
 		ensureDirectory(path)
 	end
 
-	def self.iteratePath(path, matchKey, pathes, recursive, dirOnly, fullMatch=false)
-		Dir.foreach( path ) do |aPath|
-			next if aPath == '.' or aPath == '..'
+	def self.iteratePath(path, matchKey, pathes, recursive, dirOnly, maxDepth=-1, currentDepth=0)
+		begin
+			Dir.foreach( path ) do |aPath|
+				next if aPath == '.' or aPath == '..'
 
-			fullPath = path.sub(/\/+$/,"") + "/" + aPath
-			if FileTest.directory?(fullPath) then
-				if dirOnly then
-					if matchKey==nil || ( aPath.match(matchKey)!=nil ) then 
-						pathes.push( fullPath )
+				fullPath = path.sub(/\/+$/,"") + "/" + aPath
+				if FileTest.directory?(fullPath) then
+					if dirOnly then
+						if matchKey==nil || ( aPath.match(matchKey)!=nil ) then 
+							pathes.push( fullPath )
+						end
 					end
-				end
-				if recursive then
-					iteratePath( fullPath, matchKey, pathes, recursive, dirOnly )
-				end
-			else
-				if !dirOnly then
-					if matchKey==nil || ( aPath.match(matchKey)!=nil ) || (fullMatch && fullPath.match(matchKey)) then
-						pathes.push( fullPath )
+					if recursive then
+						iteratePath( fullPath, matchKey, pathes, recursive, dirOnly, maxDepth, currentDepth+1 ) if maxDepth<=0 || currentDepth<maxDepth
+					end
+				else
+					if !dirOnly then
+						if matchKey==nil || ( aPath.match(matchKey)!=nil ) then 
+							pathes.push( fullPath )
+						end
 					end
 				end
 			end
+		rescue => e
 		end
 	end
 
 	def self.getFilenameFromPath(path)
+		path = path.to_s
 		pos = path.rindex("/")
 		path = pos ? path.slice(pos+1, path.length-pos) : path
 		return path
@@ -100,27 +113,60 @@ class FileUtil
 	end
 
 	# get regexp matched file list
-	def self.getSpecifiedFiles(path, regExpFilter)
-		paths = []
-
-		path = File.expand_path(path.to_s) if path
-
-		if FileTest.directory?(path) then
-			iteratePath(path, regExpFilter, paths, true, false, false)
-		elsif File.exist?(path) then
-			paths << path
-		end
-
-		return paths
-	end
-
-	# get regexp matched file list
 	def self.getRegExpFilteredFiles(basePath, fileFilter)
 		result=[]
 		iteratePath(basePath, fileFilter, result, true, false)
 
 		return result
 	end
+
+	class FileScannerTask < TaskAsync
+		def initialize(resultCollector, path, fileFilter)
+			super("FileScannerTask #{path}")
+			@resultCollector = resultCollector
+			@path = path
+			@fileFilter = fileFilter
+		end
+
+		def execute
+			result = FileUtil.getRegExpFilteredFiles(@path, @fileFilter)
+			@resultCollector.onResult(@path, result) if result && !result.empty?
+			_doneTask()
+		end
+	end
+
+	def self.getRegExpFilteredFilesMT(paths, fileFilter)
+		resultCollector = ResultCollector.new()
+		taskMan = ThreadPool.new(2)
+		paths.to_a.each do | aPath |
+			taskMan.addTask( FileScannerTask.new( resultCollector, aPath, fileFilter ) )
+		end
+		taskMan.executeAll()
+		taskMan.finalize()
+
+		result = resultCollector.getResult()
+		result.uniq!
+
+		return result
+	end
+
+
+	def self.getRegExpFilteredFilesMT2(path, fileFilter)
+		rootDirs=[]
+		iteratePath(path, nil, rootDirs, false, true, 1)
+		return getRegExpFilteredFilesMT( rootDirs, fileFilter )
+	end
+
+
+	def self.getFileWriter(path, enableAppend=false)
+		result = nil
+		begin
+			result = File.open(path, ( enableAppend && File.exist?(path) ) ? "a" : "w")
+		rescue => ex
+		end
+		return result
+	end
+
 
 	def self.writeFile(path, body)
 		if path then
@@ -144,7 +190,8 @@ class FileUtil
 		if path && FileTest.exist?(path) then
 			fileReader = File.open(path)
 			if fileReader then
-				result = StrUtil.ensureUtf8(fileReader.read)
+				buf = fileReader.read
+				result = StrUtil.ensureUtf8(buf) if buf.valid_encoding?
 				fileReader.close
 			end
 		end
@@ -253,3 +300,5 @@ class FileStream < Stream
 		return @io ? @io.readlines : []
 	end
 end
+
+
