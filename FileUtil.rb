@@ -17,7 +17,7 @@ require_relative "TaskManager"
 
 class FileUtil
 	def self.ensureDirectory(targetPath)
-		paths = targetPath.to_s.split("/")
+		paths = File.expand_path(targetPath).to_s.split("/")
 		path = ""
 		paths.each do |aPath|
 			path = path + ( path.end_with?("/") ? "" : "/" ) +aPath
