@@ -39,4 +39,21 @@ class TestFileUtil < Minitest::Test
 		FileUtils.rm_f(DEF_FILE_READ_WRITE_TEST_PATH) if File.exist?(DEF_FILE_READ_WRITE_TEST_PATH)
 		teardown()
 	end
+
+
+	def test_write_read_file_array
+		FileUtils.rm_f(DEF_FILE_READ_WRITE_TEST_PATH) if File.exist?(DEF_FILE_READ_WRITE_TEST_PATH)
+		FileUtil.ensureDirectory(DEF_BASE_TEST_PATH)
+
+		writeBody = ["hoge"]
+		FileUtil.writeFile(DEF_FILE_READ_WRITE_TEST_PATH, writeBody)
+		assert_equal true, File.exist?(DEF_FILE_READ_WRITE_TEST_PATH)
+
+		readBody = FileUtil.readFileAsArray(DEF_FILE_READ_WRITE_TEST_PATH)
+		assert_equal readBody, writeBody
+
+		FileUtils.rm_f(DEF_FILE_READ_WRITE_TEST_PATH) if File.exist?(DEF_FILE_READ_WRITE_TEST_PATH)
+		teardown()
+	end
+
 end
