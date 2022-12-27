@@ -6,12 +6,10 @@ class TestFileUtil < Minitest::Test
 	DEF_ENSUREDIRECTORY_TEST_PATH="#{DEF_BASE_TEST_PATH}/ruby"
 
 	def setup
-		puts "setup"
 		FileUtils.rm_rf(DEF_BASE_TEST_PATH) if Dir.exist?(DEF_BASE_TEST_PATH)
 	end
 
 	def teardown
-		puts "teardown"
 		FileUtils.rm_rf(DEF_BASE_TEST_PATH) if Dir.exist?(DEF_BASE_TEST_PATH)
 	end
 
@@ -23,9 +21,17 @@ class TestFileUtil < Minitest::Test
 		teardown()
 	end
 
+	def test_getFilenameFromPath
+		puts "test_getFilenameFromPath"
+		assert_equal "hoge", FileUtil.getFilenameFromPath("/folder/hoge")
+		assert_equal "hoge", FileUtil.getFilenameFromPath("/hoge")
+		assert_equal "hoge", FileUtil.getFilenameFromPath("hoge")
+	end
+
 	DEF_FILE_READ_WRITE_TEST_PATH="#{DEF_BASE_TEST_PATH}/test"
 
 	def test_write_read_file
+		puts "test_write_read_file"
 		FileUtils.rm_f(DEF_FILE_READ_WRITE_TEST_PATH) if File.exist?(DEF_FILE_READ_WRITE_TEST_PATH)
 		FileUtil.ensureDirectory(DEF_BASE_TEST_PATH)
 
@@ -42,6 +48,7 @@ class TestFileUtil < Minitest::Test
 
 
 	def test_write_read_file_array
+		puts "test_write_read_file_array"
 		FileUtils.rm_f(DEF_FILE_READ_WRITE_TEST_PATH) if File.exist?(DEF_FILE_READ_WRITE_TEST_PATH)
 		FileUtil.ensureDirectory(DEF_BASE_TEST_PATH)
 
@@ -57,6 +64,7 @@ class TestFileUtil < Minitest::Test
 	end
 
 	def test_appendLineToFile
+		puts "test_appendLineToFile"
 		FileUtils.rm_f(DEF_FILE_READ_WRITE_TEST_PATH) if File.exist?(DEF_FILE_READ_WRITE_TEST_PATH)
 		FileUtil.ensureDirectory(DEF_BASE_TEST_PATH)
 
