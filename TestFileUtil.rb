@@ -56,4 +56,21 @@ class TestFileUtil < Minitest::Test
 		teardown()
 	end
 
+	def test_appendLineToFile
+		FileUtils.rm_f(DEF_FILE_READ_WRITE_TEST_PATH) if File.exist?(DEF_FILE_READ_WRITE_TEST_PATH)
+		FileUtil.ensureDirectory(DEF_BASE_TEST_PATH)
+
+		writeBody = ["hoge"]
+		FileUtil.writeFile(DEF_FILE_READ_WRITE_TEST_PATH, writeBody)
+		append = "hoge2"
+		FileUtil.appendLineToFile(DEF_FILE_READ_WRITE_TEST_PATH, append)
+		writeBody << append
+
+		readBody = FileUtil.readFileAsArray(DEF_FILE_READ_WRITE_TEST_PATH)
+		assert_equal readBody, writeBody
+
+		FileUtils.rm_f(DEF_FILE_READ_WRITE_TEST_PATH) if File.exist?(DEF_FILE_READ_WRITE_TEST_PATH)
+		teardown()
+	end
+
 end
