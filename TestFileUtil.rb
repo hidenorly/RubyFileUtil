@@ -28,6 +28,13 @@ class TestFileUtil < Minitest::Test
 		assert_equal "hoge", FileUtil.getFilenameFromPath("hoge")
 	end
 
+	def test_getFilenameFromPathWithoutExt
+		puts "test_getFilenameFromPathWithoutExt"
+		assert_equal "hoge", FileUtil.getFilenameFromPathWithoutExt("/folder/hoge.so")
+		assert_equal "hoge", FileUtil.getFilenameFromPathWithoutExt("/hoge.so")
+		assert_equal "hoge", FileUtil.getFilenameFromPathWithoutExt("hoge")
+	end
+
 	DEF_FILE_READ_WRITE_TEST_PATH="#{DEF_BASE_TEST_PATH}/test"
 
 	def test_write_read_file
