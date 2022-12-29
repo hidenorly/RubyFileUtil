@@ -35,6 +35,20 @@ class TestFileUtil < Minitest::Test
 		assert_equal "hoge", FileUtil.getFilenameFromPathWithoutExt("hoge")
 	end
 
+	def test_getDirectoryFromPath
+		puts "test_getDirectoryFromPath"
+		assert_equal "/folder", FileUtil.getDirectoryFromPath("/folder/hoge.so")
+		assert_equal "/", FileUtil.getDirectoryFromPath("/hoge.so")
+		assert_equal ".", FileUtil.getDirectoryFromPath("hoge")
+		assert_equal "./hoge", FileUtil.getDirectoryFromPath("hoge/hoge2")
+		assert_equal "./hoge", FileUtil.getDirectoryFromPath("./hoge/hoge2")
+
+		assert_equal "/folder", FileUtil.getDirectoryFromPath("//folder/hoge.so")
+		assert_equal "/", FileUtil.getDirectoryFromPath("//hoge.so")
+		assert_equal "./hoge", FileUtil.getDirectoryFromPath("hoge//hoge2")
+		assert_equal "./hoge", FileUtil.getDirectoryFromPath(".///hoge//hoge2")
+	end
+
 	DEF_FILE_READ_WRITE_TEST_PATH="#{DEF_BASE_TEST_PATH}/test"
 
 	def test_write_read_file

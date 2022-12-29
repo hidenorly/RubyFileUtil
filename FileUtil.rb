@@ -99,12 +99,21 @@ class FileUtil
 		return path
 	end
 
+	def self.getEnsuredPath(path)
+		oldLen = 0
+		while( oldLen != path.length) do
+			oldLen = path.length
+			path = path.gsub("//", "/")
+		end
+		path = path.start_with?("/") ? path : path.start_with?(".") ? path : "./#{path}"
+		return path
+	end
+
 	def self.getDirectoryFromPath(path)
+		path = getEnsuredPath(path)
 		pos = path.rindex("/")
 		path = pos ? path.slice(0, pos) : path
-		while( path.end_with?("/") ) do
-			path = path.slice( 0, path.length-1 )
-		end
+		path = "/" if path.empty?
 		return path
 	end
 
