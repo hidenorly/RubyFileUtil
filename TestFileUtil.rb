@@ -21,6 +21,31 @@ class TestFileUtil < Minitest::Test
 		teardown()
 	end
 
+	@tmpCount = 0
+	def _createTmpFile(basePath)
+		@tmpCount = 0 if !@tmpCount
+		@tmpCount = @tmpCount.to_i + 1
+		path = "#{basePath}/#{@tmpCount.to_s}"
+		FileUtil.writeFile(path, ["tempFile"] )
+	end
+
+	def test_removeDirectoryIfNoFile
+		puts "test_removeDirectoryIfNoFile"
+		setup()
+		FileUtil.ensureDirectory(DEF_ENSUREDIRECTORY_TEST_PATH)
+		assert_equal true, Dir.exist?(DEF_ENSUREDIRECTORY_TEST_PATH)
+		FileUtil.removeDirectoryIfNoFile(DEF_ENSUREDIRECTORY_TEST_PATH)
+		assert_equal false, Dir.exist?(DEF_ENSUREDIRECTORY_TEST_PATH)
+
+		FileUtil.ensureDirectory(DEF_ENSUREDIRECTORY_TEST_PATH)
+		assert_equal true, Dir.exist?(DEF_ENSUREDIRECTORY_TEST_PATH)
+		_createTmpFile(DEF_ENSUREDIRECTORY_TEST_PATH)
+		FileUtil.removeDirectoryIfNoFile(DEF_ENSUREDIRECTORY_TEST_PATH)
+		assert_equal true, Dir.exist?(DEF_ENSUREDIRECTORY_TEST_PATH)
+
+		teardown()
+	end
+
 	def test_getFilenameFromPath
 		puts "test_getFilenameFromPath"
 		assert_equal "hoge", FileUtil.getFilenameFromPath("/folder/hoge")
