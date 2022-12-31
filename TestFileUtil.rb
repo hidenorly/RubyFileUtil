@@ -46,6 +46,28 @@ class TestFileUtil < Minitest::Test
 		teardown()
 	end
 
+	DEF_ENSUREDIRECTORY_TEST_PATH2="#{DEF_ENSUREDIRECTORY_TEST_PATH}/ruby2"
+
+	def test_cleanupDirectory
+		puts "test_cleanupDirectory"
+		setup()
+		FileUtil.cleanupDirectory(DEF_ENSUREDIRECTORY_TEST_PATH)
+		assert_equal true, Dir.exist?(DEF_ENSUREDIRECTORY_TEST_PATH)
+
+		_createTmpFile(DEF_ENSUREDIRECTORY_TEST_PATH)
+		FileUtil.cleanupDirectory(DEF_ENSUREDIRECTORY_TEST_PATH, true, true)
+		assert_equal true, Dir.exist?(DEF_ENSUREDIRECTORY_TEST_PATH)
+
+		FileUtil.ensureDirectory(DEF_ENSUREDIRECTORY_TEST_PATH2)
+		FileUtil.cleanupDirectory(DEF_ENSUREDIRECTORY_TEST_PATH, true, true)
+		assert_equal true, Dir.exist?(DEF_ENSUREDIRECTORY_TEST_PATH)
+		assert_equal false, Dir.exist?(DEF_ENSUREDIRECTORY_TEST_PATH2)
+
+		#TODO: check file existence in the path
+
+		teardown()
+	end
+
 	def test_getFilenameFromPath
 		puts "test_getFilenameFromPath"
 		assert_equal "hoge", FileUtil.getFilenameFromPath("/folder/hoge")
