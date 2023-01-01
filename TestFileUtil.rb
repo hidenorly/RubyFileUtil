@@ -27,6 +27,7 @@ class TestFileUtil < Minitest::Test
 		@tmpCount = @tmpCount.to_i + 1
 		path = "#{basePath}/#{@tmpCount.to_s}"
 		FileUtil.writeFile(path, ["tempFile"] )
+		return File.exist?(path) ? path : nil
 	end
 
 	def test_removeDirectoryIfNoFile
@@ -64,6 +65,27 @@ class TestFileUtil < Minitest::Test
 		assert_equal false, Dir.exist?(DEF_ENSUREDIRECTORY_TEST_PATH2)
 
 		#TODO: check file existence in the path
+
+		teardown()
+	end
+
+
+	def test_iteratePath
+		puts "test_iteratePath"
+		setup()
+
+		FileUtil.cleanupDirectory(DEF_ENSUREDIRECTORY_TEST_PATH, true, true)
+		assert_equal true, Dir.exist?(DEF_ENSUREDIRECTORY_TEST_PATH)
+
+		tmpFiles = []
+		tmpFiles << _createTmpFile(DEF_ENSUREDIRECTORY_TEST_PATH)
+		tmpFiles << _createTmpFile(DEF_ENSUREDIRECTORY_TEST_PATH)
+
+		results = []
+		FileUtil.iteratePath(DEF_ENSUREDIRECTORY_TEST_PATH, nil, results, true, false)
+		assert_equal results, tmpFiles
+
+		#TODO: should have recursive=false case, dirOnly=true case
 
 		teardown()
 	end
