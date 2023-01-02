@@ -60,11 +60,18 @@ class TestFileUtil < Minitest::Test
 		assert_equal true, Dir.exist?(DEF_ENSUREDIRECTORY_TEST_PATH)
 
 		FileUtil.ensureDirectory(DEF_ENSUREDIRECTORY_TEST_PATH2)
+		_createTmpFile(DEF_ENSUREDIRECTORY_TEST_PATH)
+		_createTmpFile(DEF_ENSUREDIRECTORY_TEST_PATH2)
 		FileUtil.cleanupDirectory(DEF_ENSUREDIRECTORY_TEST_PATH, true, true)
 		assert_equal true, Dir.exist?(DEF_ENSUREDIRECTORY_TEST_PATH)
 		assert_equal false, Dir.exist?(DEF_ENSUREDIRECTORY_TEST_PATH2)
 
-		#TODO: check file existence in the path
+		#check file existence in the path
+		results1 = []
+		FileUtil.iteratePath(DEF_ENSUREDIRECTORY_TEST_PATH, nil, results1, true, false)
+		results2 = []
+		FileUtil.iteratePath(DEF_ENSUREDIRECTORY_TEST_PATH, nil, results2, true, true)
+		assert_equal results1, results2
 
 		teardown()
 	end
