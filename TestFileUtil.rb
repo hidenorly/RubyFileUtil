@@ -76,7 +76,6 @@ class TestFileUtil < Minitest::Test
 		teardown()
 	end
 
-
 	def test_iteratePath
 		puts "test_iteratePath"
 		setup()
@@ -96,6 +95,28 @@ class TestFileUtil < Minitest::Test
 
 		teardown()
 	end
+
+	def test_getRegExpFilteredFiles
+		puts "test_getRegExpFilteredFiles"
+		setup()
+
+		FileUtil.cleanupDirectory(DEF_ENSUREDIRECTORY_TEST_PATH, true, true)
+		assert_equal true, Dir.exist?(DEF_ENSUREDIRECTORY_TEST_PATH)
+
+		tmpFiles = []
+		tmpFiles << _createTmpFile(DEF_ENSUREDIRECTORY_TEST_PATH)
+		tmpFiles << _createTmpFile(DEF_ENSUREDIRECTORY_TEST_PATH)
+
+		results = FileUtil.getRegExpFilteredFiles(DEF_ENSUREDIRECTORY_TEST_PATH, nil)
+		assert_equal results, tmpFiles
+		results = FileUtil.getRegExpFilteredFiles(DEF_ENSUREDIRECTORY_TEST_PATH, "[0-9]+")
+		assert_equal results, tmpFiles
+		results = FileUtil.getRegExpFilteredFiles(DEF_ENSUREDIRECTORY_TEST_PATH, "[a-zA-Z]+")
+		assert_equal true, results.empty?
+
+		teardown()
+	end
+
 
 	def test_getFilenameFromPath
 		puts "test_getFilenameFromPath"
