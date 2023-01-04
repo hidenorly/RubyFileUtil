@@ -108,15 +108,35 @@ class TestFileUtil < Minitest::Test
 		tmpFiles << _createTmpFile(DEF_ENSUREDIRECTORY_TEST_PATH)
 
 		results = FileUtil.getRegExpFilteredFiles(DEF_ENSUREDIRECTORY_TEST_PATH, nil)
-		assert_equal results, tmpFiles
+		assert_equal tmpFiles, results
 		results = FileUtil.getRegExpFilteredFiles(DEF_ENSUREDIRECTORY_TEST_PATH, "[0-9]+")
-		assert_equal results, tmpFiles
+		assert_equal tmpFiles, results
 		results = FileUtil.getRegExpFilteredFiles(DEF_ENSUREDIRECTORY_TEST_PATH, "[a-zA-Z]+")
 		assert_equal true, results.empty?
 
 		teardown()
 	end
 
+	def test_getRegExpFilteredFilesMT2
+		puts "test_getRegExpFilteredFilesMT2"
+		setup()
+
+		FileUtil.cleanupDirectory(DEF_ENSUREDIRECTORY_TEST_PATH, true, true)
+		assert_equal true, Dir.exist?(DEF_ENSUREDIRECTORY_TEST_PATH)
+
+		tmpFiles = []
+		tmpFiles << _createTmpFile(DEF_ENSUREDIRECTORY_TEST_PATH)
+		tmpFiles << _createTmpFile(DEF_ENSUREDIRECTORY_TEST_PATH)
+
+		results = FileUtil.getRegExpFilteredFilesMT2(DEF_ENSUREDIRECTORY_TEST_PATH, nil)
+		assert_equal tmpFiles, results
+		results = FileUtil.getRegExpFilteredFilesMT2(DEF_ENSUREDIRECTORY_TEST_PATH, "[0-9]+")
+		assert_equal tmpFiles, results
+		results = FileUtil.getRegExpFilteredFilesMT2(DEF_ENSUREDIRECTORY_TEST_PATH, "[a-zA-Z]+")
+		assert_equal true, results.empty?
+
+		teardown()
+	end
 
 	def test_getFilenameFromPath
 		puts "test_getFilenameFromPath"

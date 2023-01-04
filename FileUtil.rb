@@ -158,8 +158,11 @@ class FileUtil
 
 	def self.getRegExpFilteredFilesMT2(path, fileFilter)
 		rootDirs=[]
-		iteratePath(path, nil, rootDirs, false, true, 1)
-		return getRegExpFilteredFilesMT( rootDirs, fileFilter )
+		iteratePath(path, fileFilter, rootDirs, false, true, 1)
+		rootDirsFiles=[]
+		iteratePath(path, fileFilter, rootDirsFiles, false, false)
+		rootDirsFiles = rootDirsFiles - rootDirs
+		return getRegExpFilteredFilesMT( rootDirs, fileFilter ) | rootDirsFiles
 	end
 
 
