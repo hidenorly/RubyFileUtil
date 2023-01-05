@@ -117,6 +117,34 @@ class TestFileUtil < Minitest::Test
 		teardown()
 	end
 
+	def test_getRegExpFilteredFilesMT
+		puts "test_getRegExpFilteredFilesMT"
+		setup()
+
+		targets = [ DEF_ENSUREDIRECTORY_TEST_PATH, DEF_ENSUREDIRECTORY_TEST_PATH2 ]
+		tmpFiles = []
+		targets.each do | aTarget |
+			FileUtil.cleanupDirectory(aTarget, true, true)
+			assert_equal true, Dir.exist?(aTarget)
+
+			tmpFiles << _createTmpFile(aTarget)
+			tmpFiles << _createTmpFile(aTarget)
+		end
+		tmpFiles.sort!
+
+		results = FileUtil.getRegExpFilteredFilesMT(targets, nil)
+		results.sort!
+		assert_equal tmpFiles, results
+		results = FileUtil.getRegExpFilteredFilesMT(targets, "[0-9]+")
+		results.sort!
+		assert_equal tmpFiles, results
+		results = FileUtil.getRegExpFilteredFilesMT(targets, "[a-zA-Z]+")
+		results.sort!
+		assert_equal true, results.empty?
+
+		teardown()
+	end
+
 	def test_getRegExpFilteredFilesMT2
 		puts "test_getRegExpFilteredFilesMT2"
 		setup()
