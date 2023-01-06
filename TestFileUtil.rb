@@ -21,6 +21,19 @@ class TestFileUtil < Minitest::Test
 		teardown()
 	end
 
+	def test_getEnsuredPath
+		puts "test_getEnsuredPath"
+		assert_equal "/", FileUtil.getEnsuredPath("/")
+		assert_equal "/", FileUtil.getEnsuredPath("//")
+		assert_equal ".", FileUtil.getEnsuredPath(".")
+		assert_equal ".", FileUtil.getEnsuredPath("./")
+		assert_equal "./hoge", FileUtil.getEnsuredPath("hoge")
+		assert_equal "/hoge", FileUtil.getEnsuredPath("//hoge/")
+		assert_equal "/hoge", FileUtil.getEnsuredPath("//hoge//")
+		assert_equal "./hoge/hoge", FileUtil.getEnsuredPath("hoge//hoge")
+		assert_equal "./hoge/hoge", FileUtil.getEnsuredPath("hoge//hoge//")
+	end
+
 	@tmpCount = 0
 	def _createTmpFile(basePath)
 		@tmpCount = 0 if !@tmpCount

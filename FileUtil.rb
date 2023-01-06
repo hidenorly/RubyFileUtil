@@ -106,6 +106,7 @@ class FileUtil
 			path = path.gsub("//", "/")
 		end
 		path = path.start_with?("/") ? path : path.start_with?(".") ? path : "./#{path}"
+		path = path.end_with?("/") && path.length != 1 ? path.slice(0, path.length-1) : path
 		return path
 	end
 
@@ -297,7 +298,7 @@ class FileStream < Stream
 	end
 
 	def readline
-		return @io ? @io.readline : nil
+		return @io ? @io.readline.chomp : nil
 	end
 
 	def each_line
