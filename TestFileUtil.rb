@@ -260,7 +260,6 @@ class TestFileUtil < Minitest::Test
 		teardown()
 	end
 
-
 	def test_ArrayStream
 		puts "test_ArrayStream"
 		testData = ["line1", "line2"]
@@ -272,4 +271,24 @@ class TestFileUtil < Minitest::Test
 		assert_equal true, stream.eof?
 	end
 
+
+	def test_FileStream
+		puts "test_ArrayStream"
+		testData = ["line1", "line2"]
+
+		FileUtils.rm_f(DEF_FILE_READ_WRITE_TEST_PATH) if File.exist?(DEF_FILE_READ_WRITE_TEST_PATH)
+		FileUtil.ensureDirectory(DEF_BASE_TEST_PATH)
+		FileUtil.writeFile(DEF_FILE_READ_WRITE_TEST_PATH, testData)
+		assert_equal true, File.exist?(DEF_FILE_READ_WRITE_TEST_PATH)
+
+		stream = FileStream.new( DEF_FILE_READ_WRITE_TEST_PATH )
+		testData.each do |aLine|
+			assert_equal false, stream.eof?
+			assert_equal aLine, stream.readline
+		end
+		assert_equal true, stream.eof?
+
+		FileUtils.rm_f(DEF_FILE_READ_WRITE_TEST_PATH) if File.exist?(DEF_FILE_READ_WRITE_TEST_PATH)
+		teardown()
+	end
 end
