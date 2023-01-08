@@ -260,4 +260,16 @@ class TestFileUtil < Minitest::Test
 		teardown()
 	end
 
+
+	def test_ArrayStream
+		puts "test_ArrayStream"
+		testData = ["line1", "line2"]
+		stream = ArrayStream.new( testData )
+		testData.each do |aLine|
+			assert_equal false, stream.eof?
+			assert_equal aLine, stream.readline
+		end
+		assert_equal true, stream.eof?
+	end
+
 end
