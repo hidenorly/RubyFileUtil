@@ -269,6 +269,8 @@ class TestFileUtil < Minitest::Test
 			assert_equal aLine, stream.readline
 		end
 		assert_equal true, stream.eof?
+
+		assert_equal testData, stream.readlines
 	end
 
 
@@ -284,9 +286,11 @@ class TestFileUtil < Minitest::Test
 		stream = FileStream.new( DEF_FILE_READ_WRITE_TEST_PATH )
 		testData.each do |aLine|
 			assert_equal false, stream.eof?
-			assert_equal aLine, stream.readline
+			assert_equal aLine, stream.readline.strip
 		end
 		assert_equal true, stream.eof?
+
+		assert_equal testData, stream.readlines
 
 		FileUtils.rm_f(DEF_FILE_READ_WRITE_TEST_PATH) if File.exist?(DEF_FILE_READ_WRITE_TEST_PATH)
 		teardown()

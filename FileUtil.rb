@@ -305,8 +305,16 @@ class FileStream < Stream
 		return @io ? @io.each_line : [].each
 	end
 
-	def readlines
-		return @io ? @io.readlines : []
+	def readlines(pos = 0)
+		result = []
+		if @io then
+			@io.seek(pos, IO::SEEK_SET) if pos>=0
+			result = @io.readlines
+			result.each do |aLine|
+				aLine.chomp!
+			end
+		end
+		return result
 	end
 end
 
