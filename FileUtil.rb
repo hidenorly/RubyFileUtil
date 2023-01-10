@@ -243,15 +243,15 @@ class Stream
 		return nil
 	end
 
-	def each_line
-		return [].each
+	def each_line(pos = 0)
+		return readlines(pos).each
 	end
 
 	def each
 		return each_line
 	end
 
-	def readlines
+	def readlines(pos = 0)
 		return []
 	end
 end
@@ -275,12 +275,17 @@ class ArrayStream < Stream
 		return result
 	end
 
-	def each_line
-		return @dataArray.each
-	end
-
-	def readlines
-		return @dataArray
+	def readlines(pos = 0)
+		result = @dataArray
+		if pos>0 then
+			tmpData = ""
+			@dataArray.each do |aData|
+				tmpData = "#{tmpData}#{aData}\n"
+			end
+			tmpData = tmpData.slice(pos, tmpData.length)
+			result = tmpData.split("\n")
+		end
+		return result
 	end
 end
 
@@ -299,10 +304,6 @@ class FileStream < Stream
 
 	def readline
 		return @io ? @io.readline.chomp : nil
-	end
-
-	def each_line
-		return @io ? @io.each_line : [].each
 	end
 
 	def readlines(pos = 0)

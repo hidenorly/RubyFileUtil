@@ -271,6 +271,15 @@ class TestFileUtil < Minitest::Test
 		assert_equal true, stream.eof?
 
 		assert_equal testData, stream.readlines
+
+		testData2 = ["ine1", "line2"]
+		assert_equal testData2, stream.readlines(1)
+
+		i = 0
+		stream.each_line do |aLine|
+			assert_equal aLine, testData[i]
+			i = i + 1
+		end
 	end
 
 
@@ -291,6 +300,15 @@ class TestFileUtil < Minitest::Test
 		assert_equal true, stream.eof?
 
 		assert_equal testData, stream.readlines
+
+		testData2 = ["ine1", "line2"]
+		assert_equal testData2, stream.readlines(1)
+
+		i = 0
+		stream.each_line do |aLine|
+			assert_equal aLine, testData[i]
+			i = i + 1
+		end
 
 		FileUtils.rm_f(DEF_FILE_READ_WRITE_TEST_PATH) if File.exist?(DEF_FILE_READ_WRITE_TEST_PATH)
 		teardown()
