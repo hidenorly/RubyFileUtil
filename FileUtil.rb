@@ -254,6 +254,9 @@ class Stream
 	def readlines(pos = 0)
 		return []
 	end
+
+	def writeline(aLine)
+	end
 end
 
 class ArrayStream < Stream
@@ -287,12 +290,16 @@ class ArrayStream < Stream
 		end
 		return result
 	end
+
+	def writeline(aLine)
+		@dataArray << aLine
+	end
 end
 
 class FileStream < Stream
 	def initialize(path)
 		if File.exist?(path) then
-			@io = File.open(path)
+			@io = File.open(path, "r+")
 		else
 			@io = nil
 		end
@@ -317,6 +324,10 @@ class FileStream < Stream
 		end
 		return result
 	end
+
+	def writeline(aLine)
+		if @io then
+			@io.puts aLine
+		end
+	end
 end
-
-

@@ -280,6 +280,11 @@ class TestFileUtil < Minitest::Test
 			assert_equal aLine, testData[i]
 			i = i + 1
 		end
+
+		testData3 = "line3"
+		stream.writeline(testData3)
+		testData.concat( [testData3] )
+		assert_equal testData, stream.readlines
 	end
 
 
@@ -309,6 +314,11 @@ class TestFileUtil < Minitest::Test
 			assert_equal aLine, testData[i]
 			i = i + 1
 		end
+
+		testData3 = "line3"
+		stream.writeline(testData3)
+		testData.concat( [testData3] )
+		assert_equal testData, stream.readlines
 
 		FileUtils.rm_f(DEF_FILE_READ_WRITE_TEST_PATH) if File.exist?(DEF_FILE_READ_WRITE_TEST_PATH)
 		teardown()
