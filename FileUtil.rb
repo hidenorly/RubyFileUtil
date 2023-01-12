@@ -257,6 +257,9 @@ class Stream
 
 	def writeline(aLine)
 	end
+
+	def writelines(lines)
+	end
 end
 
 class ArrayStream < Stream
@@ -294,6 +297,10 @@ class ArrayStream < Stream
 	def writeline(aLine)
 		@dataArray << aLine
 	end
+
+	def writelines(lines)
+		@dataArray.concat(lines)
+	end
 end
 
 class FileStream < Stream
@@ -328,6 +335,14 @@ class FileStream < Stream
 	def writeline(aLine)
 		if @io then
 			@io.puts aLine
+		end
+	end
+
+	def writelines(lines)
+		if @io then
+			lines.to_a.each do |aLine|
+				@io.puts aLine
+			end
 		end
 	end
 end
