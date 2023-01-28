@@ -284,12 +284,15 @@ class TestFileUtil < Minitest::Test
 		testData3 = "line3"
 		stream.writeline(testData3)
 		testData.concat( [testData3] )
+		stream.puts(testData3)
+		testData.concat( [testData3] )
 		assert_equal testData, stream.readlines
 
 		testData4 = ["line4", "line5"]
 		stream.writelines(testData4)
 		testData.concat( testData4 )
 		assert_equal testData, stream.readlines
+		stream.close()
 	end
 
 
@@ -323,12 +326,15 @@ class TestFileUtil < Minitest::Test
 		testData3 = "line3"
 		stream.writeline(testData3)
 		testData.concat( [testData3] )
+		stream.puts(testData3)
+		testData.concat( [testData3] )
 		assert_equal testData, stream.readlines
 
 		testData4 = ["line4", "line5"]
 		stream.writelines(testData4)
 		testData.concat( testData4 )
 		assert_equal testData, stream.readlines
+		stream.close()
 
 		FileUtils.rm_f(DEF_FILE_READ_WRITE_TEST_PATH) if File.exist?(DEF_FILE_READ_WRITE_TEST_PATH)
 		teardown()

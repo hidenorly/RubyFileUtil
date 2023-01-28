@@ -118,6 +118,14 @@ class FileUtil
 		return path
 	end
 
+	def self.getFilenameHashFromPaths(paths)
+		result = {}
+		paths.each do | aPath |
+			result[ getFilenameFromPath( aPath ) ] = aPath
+		end
+		return result
+	end
+
 	# get regexp matched file list
 	def self.getRegExpFilteredFiles(basePath, fileFilter)
 		result=[]
@@ -260,6 +268,12 @@ class Stream
 
 	def writelines(lines)
 	end
+
+	def puts(buf)
+	end
+
+	def close
+	end
 end
 
 class ArrayStream < Stream
@@ -300,6 +314,15 @@ class ArrayStream < Stream
 
 	def writelines(lines)
 		@dataArray.concat(lines)
+	end
+
+	def puts(buf)
+		@dataArray << buf.to_s.strip
+	end
+
+	def close
+		@dataArray = []
+		@nPos = 0
 	end
 end
 
@@ -344,5 +367,14 @@ class FileStream < Stream
 				@io.puts aLine
 			end
 		end
+	end
+
+	def puts(buf)
+		@io.puts(buf) if @io
+	end
+
+	def close
+		@io.close() if @io
+		@io = nil
 	end
 end
