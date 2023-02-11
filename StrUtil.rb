@@ -71,7 +71,7 @@ class StrUtil
 		":"
 	]
 
-	def getJsonKey(body, curPos = 0 , lastFound)
+	def self.getJsonKey(body, curPos = 0 , lastFound = nil)
 		identifier = ":"
 		result = body
 		pos = body.index(identifier, curPos)
@@ -104,27 +104,12 @@ class StrUtil
 		return result
 	end
 
-	def ensureJson(body)
-		return "{ #{body} }".gsub(/(\w+)\s*:/, '"\1":').gsub(/,(?= *\])/, '').gsub(/,(?= *\})/, '')
-
-		result = ""
-		i = 0
-		lastFound = nil
-		theLength = body.length
-		pos = body.index(":", i)
-		while i<theLength && pos!=nil
-			pos = body.index(":", i)
-			if pos then
-				i = pos + 1
-				result = result + getJsonKey(body, pos, lastFound) + ":"
-				lastFound = i
-			else
-				result = result + body.slice(i, theLength)
-				break
-			end
-		end
-		result = body if result.empty?
-		return result
+	def self.ensureJson(body)
+		body = body.to_s
+		body = "{#{body}}" if !body.start_with?("{")
+		body = body.gsub(/(\w+)\s*:/, '"\1":').gsub(/,(?= *\])/, '').gsub(/,(?= *\})/, '')
+		body = body.gsub(/:(\w+)\s*/, ':"\1"').gsub(/,(?= *\])/, '').gsub(/,(?= *\})/, '')
+		return body
 	end
 
 
