@@ -244,6 +244,11 @@ class TestFileUtil < Minitest::Test
 
 	def test_appendLineToFile
 		puts "test_appendLineToFile"
+		begin
+			FileUtil.appendLineToFile(nil, nil)
+		rescue => e
+			assert_equal true, false
+		end
 		FileUtils.rm_f(DEF_FILE_READ_WRITE_TEST_PATH) if File.exist?(DEF_FILE_READ_WRITE_TEST_PATH)
 		FileUtil.ensureDirectory(DEF_BASE_TEST_PATH)
 
@@ -338,5 +343,27 @@ class TestFileUtil < Minitest::Test
 
 		FileUtils.rm_f(DEF_FILE_READ_WRITE_TEST_PATH) if File.exist?(DEF_FILE_READ_WRITE_TEST_PATH)
 		teardown()
+	end
+
+	def test_getFileType
+		assert_equal FileClassifier::FORMAT_SCRIPT, FileClassifier.getFileType("hoge.sh")
+		assert_equal FileClassifier::FORMAT_SCRIPT, FileClassifier.getFileType("hoge.rc")
+		assert_equal FileClassifier::FORMAT_SCRIPT, FileClassifier.getFileType("hoge.mk")
+		assert_equal FileClassifier::FORMAT_SCRIPT, FileClassifier.getFileType("hoge.te")
+		assert_equal FileClassifier::FORMAT_SCRIPT, FileClassifier.getFileType("hoge.rb")
+		assert_equal FileClassifier::FORMAT_SCRIPT, FileClassifier.getFileType("hoge.py")
+
+		assert_equal FileClassifier::FORMAT_C, FileClassifier.getFileType("hoge.c")
+		assert_equal FileClassifier::FORMAT_C, FileClassifier.getFileType("hoge.cxx")
+		assert_equal FileClassifier::FORMAT_C, FileClassifier.getFileType("hoge.cpp")
+		assert_equal FileClassifier::FORMAT_C, FileClassifier.getFileType("hoge.h")
+		assert_equal FileClassifier::FORMAT_C, FileClassifier.getFileType("hoge.hpp")
+
+		assert_equal FileClassifier::FORMAT_JAVA, FileClassifier.getFileType("hoge.java")
+
+		assert_equal FileClassifier::FORMAT_JSON, FileClassifier.getFileType("hoge.json")
+		assert_equal FileClassifier::FORMAT_JSON, FileClassifier.getFileType("hoge.bp")
+
+		assert_equal FileClassifier::FORMAT_UNKNOWN, FileClassifier.getFileType("hoge.")
 	end
 end

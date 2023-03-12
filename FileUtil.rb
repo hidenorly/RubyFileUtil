@@ -233,8 +233,10 @@ class FileUtil
 	end
 
 	def self.appendLineToFile(path, line)
-		open(path, "a") do |f|
-			f.puts line
+		if path then
+			open(path, "a") do |f|
+				f.puts line.to_s
+			end
 		end
 	end
 end
@@ -376,5 +378,81 @@ class FileStream < Stream
 	def close
 		@io.close() if @io
 		@io = nil
+	end
+end
+
+
+class FileClassifier
+	FORMAT_UNKNOWN = 0
+	FORMAT_SCRIPT = 1
+	FORMAT_C = 2
+	FORMAT_JAVA = 3
+	FORMAT_JSON = 4
+
+	def self.getFileType(aLine)
+		return FORMAT_SCRIPT if aLine.end_with?(".sh") || aLine.end_with?(".rc") || aLine.end_with?(".mk") || aLine.end_with?(".te") || aLine.end_with?(".rb")|| aLine.end_with?(".py")
+		return FORMAT_C if aLine.end_with?(".c") || aLine.end_with?(".cxx") || aLine.end_with?(".cpp") || aLine.end_with?(".h") || aLine.end_with?(".hpp")
+		return FORMAT_JAVA if aLine.end_with?(".java")
+		return FORMAT_JSON if aLine.end_with?(".json") || aLine.end_with?(".bp")
+
+		return FORMAT_UNKNOWN
+	end
+
+	DEF_BINARY_EXTS = [
+		".apk",
+		".jar",
+		".so",
+		".ko",
+		".zip",
+		".tgz",
+		".gz",
+		".xz",
+		".png",
+		".jpg",
+		".dng",
+		".bmp",
+		".img",
+		".bin",
+		".mpg",
+		".mov",
+		".mp4",
+		".mp3",
+		".aac",
+		".amr",
+		".mkv",
+		".xls",
+		".xlsx",
+		".docx",
+		".ppt",
+		".pptx",
+		".pdf",
+		".vsd",
+		".raw",
+		".a",
+		".pyc",
+		".lib"
+	]
+
+	def self.isBinaryFile(ext)
+		ext.downcase!
+		pos = ext.rindex(".")
+		if pos then
+			ext = ext.slice(pos, ext.length)
+		end
+		return DEF_BINARY_EXTS.include?(ext)
+	end
+
+	def self.isMeanlessLine?(aLine, format)
+		result = false
+		aLine.strip!
+
+		case format
+		when FORMAT_SCRIPT then
+			result = aLine.start_with?("#")
+		when FORMAT_C, FORMAT_JAVA, FORMAT_JSON then
+			result = aLine.start_with?("//")
+		end
+
+		return result
 	end
 end
