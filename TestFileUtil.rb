@@ -1,3 +1,17 @@
+#  Copyright (C) 2023 hidenorly
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 require "minitest/autorun"
 require_relative "FileUtil"
 
@@ -365,5 +379,20 @@ class TestFileUtil < Minitest::Test
 		assert_equal FileClassifier::FORMAT_JSON, FileClassifier.getFileType("hoge.bp")
 
 		assert_equal FileClassifier::FORMAT_UNKNOWN, FileClassifier.getFileType("hoge.")
+	end
+
+	def test_isBinaryFile
+		assert_equal true, FileClassifier.isBinaryFile("hoge.so")
+		assert_equal true, FileClassifier.isBinaryFile("hoge.apk")
+		assert_equal false, FileClassifier.isBinaryFile("hoge.txt")
+		assert_equal false, FileClassifier.isBinaryFile("hoge.rb")
+	end
+
+
+	def test_isMeanlessLine
+		assert_equal true, FileClassifier.isMeanlessLine?("\# comment", FileClassifier::FORMAT_SCRIPT)
+		assert_equal false, FileClassifier.isMeanlessLine?("\# comment", FileClassifier::FORMAT_C)
+		assert_equal false, FileClassifier.isMeanlessLine?("// comment", FileClassifier::FORMAT_SCRIPT)
+		assert_equal true, FileClassifier.isMeanlessLine?("// comment", FileClassifier::FORMAT_C)
 	end
 end
